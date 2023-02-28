@@ -6,7 +6,7 @@ Chart.register(...registerables);
 function RetirementForm() {
   const [currentAge, setCurrentAge] = useState(25);
   const [retirementAge, setRetirementAge] = useState(30);
-  const [annualIncome, setAnnualIncome] = useState(10000);
+  let [annualIncome, setAnnualIncome] = useState(10000);
   const [annualSavings, setAnnualSavings] = useState(35);
   const [currentSavings, setCurrentSavings] = useState(5500);
   const [incomeIncrease, setIncomeIncrease] = useState(2);
@@ -15,24 +15,53 @@ function RetirementForm() {
   const [tableData, setTableData] = useState([]);
   const [chartData, setChartData] = useState({});
   const chartRef = useRef(null);
-
   const handleFormSubmit = (e) => {
     e.preventDefault();
+
     // Calculate the table data
     let balance = currentSavings;
     let yearData = [];
+    let prevYearEndingBalance = currentSavings;
+
     for (
       let year = currentAge;
-      year <= retirementAge + parseInt(retirementYears);
+      year < retirementAge + parseInt(retirementYears);
       year++
     ) {
-      const beginningBalance = Number(balance);
-      const investmentGrowth = beginningBalance * 0.06; // Assuming 6% investment growth
-      const contributions = annualIncome * (annualSavings / 100);
+      const savingBalance = Number(balance);
+      // if (year === currentAge) {
+      //   let investmentGrowth = savingBalance * 0.07; // Assuming 7% investment growth
+      // } else {
+      // }
+
+      if (currentAge < retirementAge) {
+        var investmentGrowth = savingBalance * 0.07; // Assuming 7% investment growth
+      } else {
+        investmentGrowth = 0; // Assuming 7% investment growth
+      }
+
+      for (
+        let year = currentAge;
+        year <= retirementAge + parseInt(retirementYears);
+        year++
+      )
+        if (year === currentAge) {
+          var contributions = incomeIncrease;
+        }
+
+      if (year === currentAge) {
+        var contributions = (annualSavings / 100) * annualIncome;
+      } else if (year < retirementAge - 1) {
+        annualIncome = annualIncome + (incomeIncrease / 100) * annualIncome;
+        contributions = (annualSavings / 100) * annualIncome;
+      } else {
+        contributions = 0;
+      }
+
       let retireWithdrawals = 0;
-      if (year <= retirementAge) {
-        retireWithdrawals = (annualIncome * (incomeRequired / 100)) / 12;
-        balance = balance + retireWithdrawals;
+      if (year < retirementAge) {
+        // retireWithdrawals = (annualIncome * (incomeRequired / 100)) / 12;
+        retireWithdrawals = 0;
       } else {
         retireWithdrawals = (annualIncome * (incomeRequired / 100)) / 12;
         balance = balance - retireWithdrawals;
@@ -40,20 +69,32 @@ function RetirementForm() {
           balance = 0;
         }
       }
+
+      // Update balance with previous year's ending balance
+      balance =
+        prevYearEndingBalance +
+        investmentGrowth +
+        contributions -
+        retireWithdrawals;
+
       yearData.push({
-        age: year,
-        beginningBalance: beginningBalance.toFixed(2),
-        retirementBalance: balance >= 0 ? balance.toFixed(2) : "N/A",
-        investmentGrowth: investmentGrowth.toFixed(2),
-        contributions: contributions.toFixed(2),
-        retireWithdrawals: balance >= 0 ? retireWithdrawals.toFixed(2) : "N/A",
-        endingBalance: balance >= 0 ? balance.toFixed(2) : "N/A",
+        age: year + 1,
+        savingBalance: savingBalance.toFixed(0),
+        retirementBalance:
+          prevYearEndingBalance >= 0 ? prevYearEndingBalance.toFixed(0) : "N/A",
+        investmentGrowth: investmentGrowth.toFixed(0),
+        contributions: contributions.toFixed(0),
+        retireWithdrawals:
+          prevYearEndingBalance >= 0 ? retireWithdrawals.toFixed(0) : "N/A",
+        endingBalance: balance >= 0 ? balance.toFixed(0) : "N/A",
       });
+
+      // Update prevYearEndingBalance with the ending balance of the current year
+      prevYearEndingBalance = balance;
     }
+
     // Update the table data state
     setTableData(yearData);
-
-    //chartdata
 
     // Create the chart data
     const chartLabels = yearData.map((rowData) => rowData.age);
@@ -69,12 +110,14 @@ function RetirementForm() {
         },
       ],
     };
+
+    // Destroy the previous chart instance before rendering the new chart
     if (chartRef.current) {
       chartRef.current.chartInstance.destroy();
     }
+
     // Render the chart
     chartRef.current = <Line data={chartData} />;
-
     setChartData(chartData);
   };
 
@@ -165,8 +208,8 @@ function RetirementForm() {
                 <th>Age</th>
                 <th>Beginning Retirement Balance</th>
                 <th>Investment Growth</th>
-                {/* <th>Contributions at {annualSavings} of Income</th>
-              <th>Retire with ${incomeRequired} of Income Withdrawals</th> */}
+                <th>Contributions at {annualSavings} of Income</th>
+                <th>Retire with ${incomeRequired} of Income Withdrawals</th>
                 <th>Ending Retirement Balance</th>
               </tr>
             </thead>
@@ -174,10 +217,10 @@ function RetirementForm() {
               {tableData.map((rowData, index) => (
                 <tr key={index}>
                   <td>{rowData.age}</td>
-                  <td>{rowData.beginningBalance}</td>
+                  <td>{rowData.savingBalance}</td>
                   <td>{rowData.investmentGrowth}</td>
-                  {/* <td>{rowData.contributions}</td>
-                <td>{rowData.retireWithdrawals}</td> */}
+                  <td>{rowData.contributions}</td>
+                  <td>{rowData.retireWithdrawals}</td>
                   <td>{rowData.endingBalance}</td>
                 </tr>
               ))}
