@@ -5,7 +5,7 @@ Chart.register(...registerables);
 
 function RetirementForm() {
   const [currentAge, setCurrentAge] = useState(25);
-  const [retirementAge, setRetirementAge] = useState(30);
+  const [retirementAge, setRetirementAge] = useState(40);
   let [annualIncome, setAnnualIncome] = useState(10000);
   const [annualSavings, setAnnualSavings] = useState(35);
   const [currentSavings, setCurrentSavings] = useState(5500);
@@ -81,7 +81,9 @@ function RetirementForm() {
         age: year + 1,
         savingBalance: savingBalance.toFixed(0),
         retirementBalance:
-          prevYearEndingBalance >= 0 ? prevYearEndingBalance.toFixed(0) : "N/A",
+          prevYearEndingBalance >= 0
+            ? Number(prevYearEndingBalance).toFixed(0)
+            : "N/A",
         investmentGrowth: investmentGrowth.toFixed(0),
         contributions: contributions.toFixed(0),
         retireWithdrawals:

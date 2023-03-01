@@ -16,7 +16,7 @@ function RetirementComparison() {
   });
 
   const [scenario2, setScenario2] = useState({
-    currentAge: 25,
+    currentAge: 35,
     retirementAge: 35,
     annualIncome: 12000,
     annualSavings: 30,
@@ -43,6 +43,21 @@ function RetirementComparison() {
   const handleShowSecondForm = () => {
     setShowSecondForm(!showSecondForm);
   };
+  const handleScenario1Change = (event) => {
+    const { name, value } = event.target;
+    setScenario1((prevScenario) => ({
+      ...prevScenario,
+      [name]: value,
+    }));
+  };
+
+  const handleScenario2Change = (event) => {
+    const { name, value } = event.target;
+    setScenario2((prevScenario) => ({
+      ...prevScenario,
+      [name]: value,
+    }));
+  };
 
   return (
     <div className="container">
@@ -56,13 +71,14 @@ function RetirementComparison() {
         <RetirementForm
           values={scenario1}
           onSubmit={handleScenario1Submit}
-          onChange={(value) => setScenario1(value)}
+          onChange={handleScenario1Change}
         />
+
         {showSecondForm && (
           <RetirementForm
             values={scenario2}
             onSubmit={handleScenario2Submit}
-            onChange={(value) => setScenario2(value)}
+            onChange={handleScenario2Change}
           />
         )}
       </div>
