@@ -32,12 +32,12 @@ function RetirementForm() {
       // if (year === currentAge) {
       //   let investmentGrowth = savingBalance * 0.07; // Assuming 7% investment growth
       // } else {
-      // }
+      // }9
 
-      if (currentAge < retirementAge) {
+      if (year < retirementAge - 1) {
         var investmentGrowth = savingBalance * 0.07; // Assuming 7% investment growth
-      } else {
-        investmentGrowth = 0; // Assuming 7% investment growth
+      } else if (year - 1 > retirementAge - 3) {
+        investmentGrowth = savingBalance * 0.04; // Assuming 7% investment growth
       }
 
       for (
@@ -59,7 +59,7 @@ function RetirementForm() {
       }
 
       let retireWithdrawals = 0;
-      if (year < retirementAge) {
+      if (year < retirementAge - 1) {
         // retireWithdrawals = (annualIncome * (incomeRequired / 100)) / 12;
         retireWithdrawals = 0;
       } else {
