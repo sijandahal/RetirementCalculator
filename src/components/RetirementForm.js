@@ -5,7 +5,7 @@ Chart.register(...registerables);
 
 function RetirementForm() {
   const [currentAge, setCurrentAge] = useState(25);
-  const [retirementAge, setRetirementAge] = useState(40);
+  const [retirementAge, setRetirementAge] = useState(30);
   let [annualIncome, setAnnualIncome] = useState(10000);
   const [annualSavings, setAnnualSavings] = useState(35);
   const [currentSavings, setCurrentSavings] = useState(5500);
@@ -28,11 +28,15 @@ function RetirementForm() {
       year < retirementAge + parseInt(retirementYears);
       year++
     ) {
-      const savingBalance = Number(balance);
+      let savingBalance = Number(balance);
       // if (year === currentAge) {
       //   let investmentGrowth = savingBalance * 0.07; // Assuming 7% investment growth
       // } else {
       // }9
+
+      if (savingBalance < 0) {
+        savingBalance = 0;
+      }
 
       if (year < retirementAge - 1) {
         var investmentGrowth = savingBalance * 0.07; // Assuming 7% investment growth
@@ -58,17 +62,34 @@ function RetirementForm() {
         contributions = 0;
       }
 
-      let retireWithdrawals = 0;
-      if (year < retirementAge - 1) {
-        // retireWithdrawals = (annualIncome * (incomeRequired / 100)) / 12;
+      for (
+        let year = currentAge;
+        year <= retirementAge + parseInt(retirementYears);
+        year + 1
+      )
+        console.log(year++ + "hello");
+      //   console.log(year++);
+      // console.log(retirementAge + "retirement age ");
+
+      let retireWithdrawals;
+
+      if (year + 1 < retirementAge) {
         retireWithdrawals = 0;
+        console.log(year + "normal age");
+        console.log(retirementAge + "retiremeent age");
+      } else if (savingBalance < 4871) {
+        // annualIncome = annualIncome + annualIncome * (incomeIncrease / 100);
+        // // console.log("");
+        // retireWithdrawals = annualIncome * (incomeRequired / 100);
+        retireWithdrawals = savingBalance + investmentGrowth;
       } else {
-        retireWithdrawals = (annualIncome * (incomeRequired / 100)) / 12;
-        balance = balance - retireWithdrawals;
-        if (balance < 0) {
-          balance = 0;
-        }
+        // annualIncome = annualIncome + annualIncome * (incomeIncrease / 100);
+        // console.log("");
+        retireWithdrawals = 4871;
       }
+
+      //   console.log(year++);
+      // console.log(retirementAge + "retirement age ");
 
       // Update balance with previous year's ending balance
       balance =
@@ -78,7 +99,7 @@ function RetirementForm() {
         retireWithdrawals;
 
       yearData.push({
-        age: year + 1,
+        age: Number(year) + 1,
         savingBalance: savingBalance.toFixed(0),
         retirementBalance:
           prevYearEndingBalance >= 0
@@ -86,8 +107,7 @@ function RetirementForm() {
             : "N/A",
         investmentGrowth: investmentGrowth.toFixed(0),
         contributions: contributions.toFixed(0),
-        retireWithdrawals:
-          prevYearEndingBalance >= 0 ? retireWithdrawals.toFixed(0) : "N/A",
+        retireWithdrawals: retireWithdrawals.toFixed(0),
         endingBalance: balance >= 0 ? balance.toFixed(0) : "N/A",
       });
 
