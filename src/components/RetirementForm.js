@@ -14,6 +14,8 @@ function RetirementForm() {
   const [retirementYears, setRetirementYears] = useState("");
   const [tableData, setTableData] = useState([]);
   const [chartData, setChartData] = useState({});
+  const [showTable, setShowTable] = useState(false);
+
   const chartRef = useRef(null);
   const handleFormSubmit = (e) => {
     e.preventDefault();
@@ -130,6 +132,13 @@ function RetirementForm() {
           borderColor: "rgb(75, 192, 192)",
           tension: 0.1,
         },
+        {
+          label: "Retirement Withdrawals",
+          data: yearData.map((rowData) => rowData.retireWithdrawals),
+          fill: false,
+          borderColor: "rgb(255, 99, 132)",
+          tension: 0.1,
+        },
       ],
     };
 
@@ -141,6 +150,9 @@ function RetirementForm() {
     // Render the chart
     chartRef.current = <Line data={chartData} />;
     setChartData(chartData);
+  };
+  const handleShowTable = () => {
+    setShowTable(true);
   };
 
   return (
@@ -223,33 +235,59 @@ function RetirementForm() {
 
           <button type="submit">Calculate</button>
         </form>
-        {tableData.length > 0 && (
-          <table>
-            <thead>
-              <tr>
-                <th>Age</th>
-                <th>Beginning Retirement Balance</th>
-                <th>Investment Growth</th>
-                <th>Contributions at {annualSavings} of Income</th>
-                <th>Retire with ${incomeRequired} of Income Withdrawals</th>
-                <th>Ending Retirement Balance</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tableData.map((rowData, index) => (
-                <tr key={index}>
-                  <td>{rowData.age}</td>
-                  <td>{rowData.savingBalance}</td>
-                  <td>{rowData.investmentGrowth}</td>
-                  <td>{rowData.contributions}</td>
-                  <td>{rowData.retireWithdrawals}</td>
-                  <td>{rowData.endingBalance}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+
+        {Object.keys(chartData).length > 0 && (
+          <>
+            <h3>
+              Retirement Saving runs out at age{" "}
+              {Number(retirementAge - Number(currentAge)) +
+                Number(retirementYears)}
+              . Where, the saving balance is {currentSavings} in the first year
+            </h3>
+            <div className="chart-container">
+              <Line ref={chartRef} data={chartData} />
+            </div>
+            {!showTable && (
+              <button onClick={handleShowTable}>Show Table</button>
+            )}
+            {showTable && (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Age</th>
+                    <th>Saving Balance</th>
+                    <th>Retirement Balance</th>
+                    <th>Investment Growth</th>
+                    <th>Contributions</th>
+                    <th>Retire Withdrawals</th>
+                    {/* <th>Ending Balance</th> */}
+                  </tr>
+                </thead>
+                <tbody>
+                  {tableData.map((rowData, index) => (
+                    <tr key={index}>
+                      <td>{rowData.age}</td>
+                      {/* <td>${rowData.savingBalance}</td> */}
+                      <td>
+                        {rowData.retirementBalance !== "N/A"
+                          ? "$" + rowData.retirementBalance
+                          : "N/A"}
+                      </td>
+                      <td>${rowData.investmentGrowth}</td>
+                      <td>${rowData.contributions}</td>
+                      <td>${rowData.retireWithdrawals}</td>
+                      <td>
+                        {rowData.endingBalance !== "N/A"
+                          ? "$" + rowData.endingBalance
+                          : "N/A"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </>
         )}
-        {chartRef.current}
       </div>
     </>
   );
